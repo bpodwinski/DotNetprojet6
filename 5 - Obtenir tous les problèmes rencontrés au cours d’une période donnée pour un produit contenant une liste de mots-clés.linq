@@ -12,34 +12,24 @@
   </Connection>
 </Query>
 
-string[] keywords = { "utilisateur" }; // Liste de mots-clés à rechercher
-string? productName = "Trader en Herbe"; // Nom du produit, ou null pour tous les produits
-string? versionNumber = null; // Numéro de version, ou null pour toutes les versions
-DateOnly? startDate = DateOnly.Parse("2024-01-01"); // Date de début de la période
-DateOnly? endDate = DateOnly.Parse("2024-12-31"); // Date de fin de la période
+// 5 - Obtenir tous les problèmes rencontrés au cours d’une période donnée pour un produit contenant une liste de mots-clés
 
+// Paramètres
+DateOnly? startDate = DateOnly.TryParse(Util.ReadLine("Entrer la date de début (format AAAA-MM-JJ) : "), out var tempStartDate) ? tempStartDate : null; // Dates de début
+DateOnly? endDate = DateOnly.TryParse(Util.ReadLine("Entrer la date de fin (format AAAA-MM-JJ) : "), out var tempEndDate) ? tempEndDate : null; // Dates de fin
+var keywords = Util.ReadLine("Entrer les mots-clés"); // Mots-clés à rechercher
+var productName = Util.ReadLine("Entrer le nom du produit"); // Nom du produit
+
+// Requête
 var query = 
     from t in Tickets
-    where (productName == null || t.Product.Name == productName)
-          && (versionNumber == null || t.Version.Number == versionNumber)
-          && (startDate == null || t.CreationDate >= startDate)
-          && (endDate == null || t.CreationDate <= endDate)
+    where (
+		t.Status == "En cours"
+		&& keywords == null || t.Problem.Contains(keywords)
+		&& productName == null || t.Product.Name == productName)
+		&& (startDate == null || t.CreationDate >= startDate)
+		&& (endDate == null || t.CreationDate <= endDate)
     select t;
-
-// Filtrage par mots-clés en utilisant Contains
-if (keywords.Length > 0)
-{
-    // Applique un premier filtre avec le premier mot-clé
-    var keywordFilter = keywords[0];
-    query = query.Where(t => t.Problem.Contains(keywordFilter));
-
-    // Ajoute des filtres supplémentaires pour les autres mots-clés
-    for (int i = 1; i < keywords.Length; i++)
-    {
-        var keyword = keywords[i];
-        query = query.Where(t => t.Problem.Contains(keyword));
-    }
-}
 
 var result = query.Select(t => new
 {

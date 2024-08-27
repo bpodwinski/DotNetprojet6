@@ -12,14 +12,12 @@
   </Connection>
 </Query>
 
-string? productName = null; // Nom du produit, ou null pour tous les produits
-string? versionNumber = null; // Numéro de version, ou null pour toutes les versions
+// 6 - Obtenir tous les problèmes résolus
 
+// Requête
 var query = 
     from t in Tickets
-    where t.Status == "Résolu"
-          && (productName == null || t.Product.Name == productName)
-          && (versionNumber == null || t.Version.Number == versionNumber)
+    where (t.Status == "Résolu")
     select new
     {
         TicketId = t.Id,

@@ -12,23 +12,19 @@
   </Connection>
 </Query>
 
-string[] keywords = { "utilisateur" }; // Liste de mots-clés à rechercher
+// 8 - Obtenir tous les problèmes résolus contenant une liste de mots-clés
 
+// Paramètres
+var keywords = Util.ReadLine("Entrer les mots-clés"); // Mots-clés à rechercher
+
+// Requête
 var query = 
     from t in Tickets
     where t.Status == "Résolu"
+		&& (keywords == null || t.Problem.Contains(keywords))
     select t;
 
-// Filtrage par mots-clés en utilisant Contains
-if (keywords.Length > 0)
-{
-    foreach (var keyword in keywords)
-    {
-        query = query.Where(t => t.Problem.Contains(keyword));
-    }
-}
-
-var result = query.Select(t => new
+object result = query.Select(t => new
 {
     TicketId = t.Id,
     ProductName = t.Product.Name,

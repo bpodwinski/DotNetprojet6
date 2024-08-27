@@ -12,16 +12,16 @@
   </Connection>
 </Query>
 
-var keywords = Util.ReadLine("Entrer les mots-clés"); // Liste de mots-clés à rechercher
-var productName = Util.ReadLine("Entrer le nom du produit"); // Nom du produit, ou null pour tous les produits
-var versionNumber = Util.ReadLine("Entrer les numéros de version"); // Numéro de version, ou null pour toutes les versions
+// 3 - Obtenir tous les problèmes en cours contenant une liste de mots-clés
 
+// Paramètres
+var keywords = Util.ReadLine("Entrer les mots-clés"); // Mots-clés à rechercher
+
+// Requête
 var query = 
     from t in Tickets
     where t.Status == "En cours"
 		&& (keywords == null || t.Problem.Contains(keywords))
-		&& (productName == null || t.Product.Name == productName)
-		&& (versionNumber == null || t.Version.Number == versionNumber)
     select t;
 
 object result = query.Select(t => new

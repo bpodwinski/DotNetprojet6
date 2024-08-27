@@ -12,29 +12,24 @@
   </Connection>
 </Query>
 
-string[] keywords = { "utilisateur" }; // Liste de mots-clés à rechercher
-string? productName = "Maître des Investissements"; // Nom du produit, obligatoire pour cibler un produit spécifique
-string? versionNumber = null; // Numéro de version, ou null pour toutes les versions
-DateOnly? startDate = DateOnly.Parse("2024-01-01"); // Date de début de la période
-DateOnly? endDate = DateOnly.Parse("2024-12-31"); // Date de fin de la période
+// 10 - Obtenir tous les problèmes résolus au cours d’une période donnée pour un produit contenant une liste de mots-clés
 
+// Paramètres
+DateOnly? startDate = DateOnly.TryParse(Util.ReadLine("Entrer la date de début (format AAAA-MM-JJ) : "), out var tempStartDate) ? tempStartDate : null; // Dates de début
+DateOnly? endDate = DateOnly.TryParse(Util.ReadLine("Entrer la date de fin (format AAAA-MM-JJ) : "), out var tempEndDate) ? tempEndDate : null; // Dates de fin
+var keywords = Util.ReadLine("Entrer les mots-clés"); // Mots-clés à rechercher
+var productName = Util.ReadLine("Entrer le nom du produit"); // Nom du produit
+
+// Requête
 var query = 
     from t in Tickets
-    where t.Status == "Résolu"
-          && t.Product.Name == productName
-          && (versionNumber == null || t.Version.Number == versionNumber)
-          && (startDate == null || t.ResolutionDate >= startDate)
-          && (endDate == null || t.ResolutionDate <= endDate)
+    where (
+		t.Status == "Résolu"
+		&& keywords == null || t.Problem.Contains(keywords)
+		&& productName == null || t.Product.Name == productName)
+		&& (startDate == null || t.CreationDate >= startDate)
+		&& (endDate == null || t.CreationDate <= endDate)
     select t;
-
-// Filtrage par mots-clés en utilisant Contains
-if (keywords.Length > 0)
-{
-    foreach (var keyword in keywords)
-    {
-        query = query.Where(t => t.Problem.Contains(keyword));
-    }
-}
 
 var result = query.Select(t => new
 {

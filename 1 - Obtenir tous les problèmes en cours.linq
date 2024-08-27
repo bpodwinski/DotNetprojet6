@@ -12,13 +12,12 @@
   </Connection>
 </Query>
 
-string? productName = null; // Nom du produit
-bool? isResolved = null; // null pour tous, false pour en cours, true pour résolus
+// 1 - Obtenir tous les problèmes en cours
 
+// Requête
 var query = 
     from t in Tickets
-    where (productName == null || t.Product.Name == productName)
-          && (isResolved == null || (isResolved == true ? t.Status == "Résolu" : t.Status == "En cours"))
+    where (t.Status == "En cours")
     select new
     {
         TicketId = t.Id,

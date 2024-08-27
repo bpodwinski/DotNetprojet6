@@ -12,25 +12,19 @@
   </Connection>
 </Query>
 
-string[] keywords = { "utilisateur" }; // Liste de mots-clés à rechercher
-string? productName = "Maître des Investissements"; // Nom du produit, obligatoire pour cibler un produit spécifique
-string? versionNumber = null; // Numéro de version, ou null pour toutes les versions
+// 9 - Obtenir tous les problèmes résolus pour un produit contenant une liste de mots-clés
 
+// Paramètres
+var keywords = Util.ReadLine("Entrer les mots-clés"); // Mots-clés à rechercher
+var productName = Util.ReadLine("Entrer le nom du produit"); // Nom du produit
+
+// Requête
 var query = 
     from t in Tickets
     where t.Status == "Résolu"
-          && t.Product.Name == productName
-          && (versionNumber == null || t.Version.Number == versionNumber)
+		&& (keywords == null || t.Problem.Contains(keywords))
+		&& (productName == null || t.Product.Name == productName)
     select t;
-
-// Filtrage par mots-clés en utilisant Contains
-if (keywords.Length > 0)
-{
-    foreach (var keyword in keywords)
-    {
-        query = query.Where(t => t.Problem.Contains(keyword));
-    }
-}
 
 var result = query.Select(t => new
 {
