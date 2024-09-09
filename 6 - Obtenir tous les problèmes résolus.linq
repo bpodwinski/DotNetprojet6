@@ -3,7 +3,7 @@
     <ID>8c7b4d93-c7a8-473a-b440-f15355aa5135</ID>
     <NamingServiceVersion>2</NamingServiceVersion>
     <Persist>true</Persist>
-    <Server>ENKI</Server>
+    <Server>.</Server>
     <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
     <Database>NexaWorksProd</Database>
     <DriverData>
