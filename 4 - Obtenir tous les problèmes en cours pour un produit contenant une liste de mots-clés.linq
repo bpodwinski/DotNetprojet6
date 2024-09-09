@@ -1,3 +1,18 @@
+<Query Kind="Statements">
+  <Connection>
+    <ID>8c7b4d93-c7a8-473a-b440-f15355aa5135</ID>
+    <NamingServiceVersion>2</NamingServiceVersion>
+    <Persist>true</Persist>
+    <Server>.</Server>
+    <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
+    <Database>NexaWorksProd</Database>
+    <DriverData>
+      <LegacyMFA>false</LegacyMFA>
+    </DriverData>
+  </Connection>
+  <IncludeUncapsulator>false</IncludeUncapsulator>
+</Query>
+
 // 4 - Obtenir tous les problèmes en cours pour un produit contenant une liste de mots-clés
 
 // Paramètres
@@ -7,22 +22,26 @@ var productName = Util.ReadLine("Entrer le nom du produit"); // Nom du produit
 // Requête
 var query = 
     from t in Tickets
-    where t.Status == "En cours"
-		&& (keywords == null || t.Problem.Contains(keywords))
-		&& (productName == null || t.Product.Name == productName)
-    select t;
+    join s in Statuses on t.StatusId equals s.Id
+    join pvo in ProductVersionOS on t.ProductVersionOSId equals pvo.Id
+    join p in Products on pvo.ProductId equals p.Id
+    join v in Versions on pvo.VersionId equals v.Id
+    join os in OperatingSystems on pvo.OperatingSystemId equals os.Id
+    where
+		t.StatusId == 1 &&
+		(string.IsNullOrWhiteSpace(productName) || p.Name == productName) &&
+        (string.IsNullOrWhiteSpace(keywords) || t.Problem.Contains(keywords))
+    select new
+    {
+        TicketId = t.Id,
+        ProductName = p.Name,
+        VersionNumber = v.Number,
+        OperatingSystemName = os.Name,
+        t.CreationDate,
+        Status = s.Name,
+        t.Problem,
+    };
 
-var result = query.Select(t => new
-{
-    TicketId = t.Id,
-    ProductName = t.Product.Name,
-    VersionNumber = t.Version.Number,
-    OperatingSystemName = t.OperatingSystem.Name,
-    t.CreationDate,
-    t.ResolutionDate,
-    t.Status,
-    t.Problem,
-    t.Resolution
-}).ToList();
+object result = query.ToList();
 
 result.Dump();
